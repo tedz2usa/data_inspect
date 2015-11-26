@@ -1,0 +1,47 @@
+#!/usr/bin/env ruby
+
+require 'data_inspect'
+require 'awesome_print'
+
+puts DataInspect.version
+
+puts DataInspect.hi
+
+
+
+def main
+
+  options = ARGV
+
+  filename = options.last
+
+  puts filename
+
+  file = File.open(filename, 'rb')
+
+  
+  DataInspect.readfile(file) do |reader|
+
+    reader.each_byte do |byte, offset|
+
+      puts "#{offset}: #{byte}"
+
+    end
+
+
+    
+
+  end
+
+
+
+
+end
+
+
+
+
+main
+
+
+
