@@ -13,10 +13,13 @@ def main
 
   options = ARGV
 
-  filename = options.last
+  filename = options.first
 
   puts filename
 
+  options = get_options
+
+  ap options
   
   DataInspect.readfile(filename) do |reader|
 
@@ -41,6 +44,86 @@ def main
 
 end
 
+
+
+def get_options
+
+  options = {}
+
+  # index 0 is the filename. 
+  arg_options = ARGV.slice(1, ARGV.size)
+
+  ap arg_options
+
+  puts arg_options[0]
+
+  boolean_flags = ['h', 'b']
+
+
+  # Populate 'flat' options hash.
+  flat_options = {}
+
+  while (arg_options.size > 0)
+
+    flag_string = consume_array_element(arg_options)
+    flag = flag_string[1,flag_string.size]
+    puts "interpreting #{flag}"
+
+    if boolean_flags.include? flag
+      flat_options[flag] = true
+    else
+      value = consume_array_element(arg_options)
+      flat_options[flag] = value
+    end
+
+  end
+
+  ap flat_options
+
+
+  # Expand 'flat' options to more useful hash.
+  
+  # :unsinged_int_display_base
+
+  options[:unsinged_int_display_base] = 'decimal'
+
+  if flat_options['h']
+    options[:unsinged_int_display_base] = 'hexadecimal'
+  end
+  
+  if flat_options['b']
+    options[:unsinged_int_display_base] = 'binary'
+  end
+
+  # :offset
+  options[:offset] = flat_options['o'] || '0'
+  options[:offset].to_i
+
+  # :limit
+  options[:limit] = flat_options['l'] || '-1'
+  options[:limit].to_i
+
+  # :combined
+  options[:combined] = flat_options['c'] || '1'
+  options[:combined] = options[:combined].to_i
+
+  # :byte_order
+  options[:byte_order] = flat_options['bo'] || 'not_applicable'
+  options[:byte_order] = options[:byte_order].to_sym  # need this to be in symbol form.
+
+  # :format
+  options[:format] = flat_options['f'] || 'unsigned_int'
+  options[:format] = options[:format].to_sym
+
+  return options
+
+end
+
+
+# Requires the array must have at least one element.
+def consume_array_element(array)
+  array.slice!(0, 1)[0]
+end
 
 
 
