@@ -5,11 +5,6 @@ class DataInspect
     '0.0.2'
   end
 
-  def self.hi
-    puts "Hi from DataInspect!!"
-    return 512
-  end
-
 
   def self.readfile(filename)
     reader = Reader.new(filename)
@@ -92,6 +87,11 @@ class Reader
   # If the file is at the end of stream.
   def atEOS?
     @file.eof?
+  end
+
+  # Seek to a given offset in the file.
+  def seek(offset)
+    @file.seek(offset)
   end
 
   private

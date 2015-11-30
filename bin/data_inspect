@@ -5,42 +5,97 @@ require 'awesome_print'
 
 puts DataInspect.version
 
-puts DataInspect.hi
 
 
 
 def main
 
   options = ARGV
-
   filename = options.first
-
-  puts filename
-
   options = get_options
 
   ap options
+
+
+
   
   DataInspect.readfile(filename) do |reader|
 
-    offset = 0
-    while !reader.atEOS?
-      # value = reader.next_unsigned_int
-      # value = reader.next_ieee_single_precision_float(:big_endian)
-      value = reader.next_ieee_double_precision_float(:big_endian)
-      #puts reader.next_unsigned_int(2, :big_endian)
-      puts "#{offset}: #{value}"
 
-      offset += 1
+    # Seek the reader.
+    if options[:offset] > 0
+      reader.seek options[:offset]
     end
 
+    offset = options[:offset]
 
+    counter = 0
+
+    care_about_limit = options[:limit] >= 0
     
+    values_to_display = {}
+
+
+
+    while (!reader.atEOS?) && !(care_about_limit && (counter >= options[:limit]))
+      
+      result = next_value_and_size(reader, options)
+      value = result[0]
+
+      # puts "#{offset}: #{value}"
+      values_to_display[offset] = value
+
+      offset  += result[1] 
+      counter += 1
+    end
+
+    # Technically incorrect, as offset is 1 word too far in advance. But this oversight is acceptable.
+    max_length_offset = Math.log10(offset).to_i + 1
+
+    puts "\n\n"
+
+    # Display the values
+    values_to_display.each do |offset, value|
+      display_offset = pad_with_spaces(offset.to_s, max_length_offset + 1)
+      puts "#{display_offset}: #{value}"
+    end
+
 
   end
 
 
 
+
+end
+
+# Returns an array of size 2,
+# first element is the returned value
+# second element is the size
+# The value is a string or object that converts to a string, to display.
+def next_value_and_size(reader, options)
+
+
+  size = options[:size]
+
+  # data types:
+  #   unsinged_int, singed_int, float, double
+  #   ascii (coming soon), utf8 (coming soon)
+
+  case options[:data_type]
+  when :unsigned_int
+    value = reader.next_unsigned_int(size, options[:byte_order])
+    value = display_in_base(value, options[:unsigned_int_display_base], size)
+  when :signed_int
+    value = reader.next_signed_int(size, options[:byte_order])
+  when :float
+    value = reader.next_ieee_single_precision_float(options[:byte_order])
+    size = 4
+  when :double
+    value = reader.next_ieee_double_precision_float(options[:byte_order])
+    size = 8
+  end
+  
+  return [value, size]
 
 end
 
@@ -53,12 +108,7 @@ def get_options
   # index 0 is the filename. 
   arg_options = ARGV.slice(1, ARGV.size)
 
-  ap arg_options
-
-  puts arg_options[0]
-
-  boolean_flags = ['h', 'b']
-
+  boolean_flags = ['h', 'b', 'v']
 
   # Populate 'flat' options hash.
   flat_options = {}
@@ -67,7 +117,6 @@ def get_options
 
     flag_string = consume_array_element(arg_options)
     flag = flag_string[1,flag_string.size]
-    puts "interpreting #{flag}"
 
     if boolean_flags.include? flag
       flat_options[flag] = true
@@ -78,42 +127,43 @@ def get_options
 
   end
 
-  ap flat_options
-
 
   # Expand 'flat' options to more useful hash.
   
-  # :unsinged_int_display_base
+  # :unsigned_int_display_base
 
-  options[:unsinged_int_display_base] = 'decimal'
+  options[:unsigned_int_display_base] = 10
 
   if flat_options['h']
-    options[:unsinged_int_display_base] = 'hexadecimal'
+    options[:unsigned_int_display_base] = 16
   end
   
   if flat_options['b']
-    options[:unsinged_int_display_base] = 'binary'
+    options[:unsigned_int_display_base] = 2
   end
 
   # :offset
   options[:offset] = flat_options['o'] || '0'
-  options[:offset].to_i
+  options[:offset] = options[:offset].to_i
 
   # :limit
   options[:limit] = flat_options['l'] || '-1'
-  options[:limit].to_i
+  options[:limit] = options[:limit].to_i
 
-  # :combined
-  options[:combined] = flat_options['c'] || '1'
-  options[:combined] = options[:combined].to_i
+  # :size
+  options[:size] = flat_options['s'] || '1'
+  options[:size] = options[:size].to_i
 
   # :byte_order
   options[:byte_order] = flat_options['bo'] || 'not_applicable'
   options[:byte_order] = options[:byte_order].to_sym  # need this to be in symbol form.
 
-  # :format
-  options[:format] = flat_options['f'] || 'unsigned_int'
-  options[:format] = options[:format].to_sym
+  # :data_type
+  options[:data_type] = flat_options['f'] || 'unsigned_int'
+  options[:data_type] = options[:data_type].to_sym
+
+  # :verbose
+  options[:verbose] = flat_options['v']
 
   return options
 
@@ -125,7 +175,33 @@ def consume_array_element(array)
   array.slice!(0, 1)[0]
 end
 
+# If base is a power of 2, will pad with 0 to fill up to
+# size in bytes
+def display_in_base(value, base, size)
+  str = value.to_s(base)
+  if Math.log2(base) % 1 == 0.0   # If base is power of 2.
+    expected_bits = size * 8
+    coverage_of_digit = Math.log2(base)
+    expected_digits = expected_bits / coverage_of_digit
+    str = pad_with_zeros(str, expected_digits)
+  end
+  str
+end
 
+
+
+def pad_with_zeros(str, max_len)
+  pad_with_character(str, '0', max_len)
+end
+
+def pad_with_spaces(str, max_len)
+  pad_with_character(str, ' ', max_len)
+end
+
+def pad_with_character(str, char, max_len)
+  difference = max_len - str.size
+  char * difference + str
+end
 
 main
 

@@ -42,9 +42,9 @@ $ data_inspect myfile -l 50
 <br><br>
 
 ```
-$ data_inspect myfile -c 2 -bo big_endian
+$ data_inspect myfile -s 2 -bo big_endian
 ```
-display the byte values with every two bytes combined, interpreting the byte order as big endian. Use `little_endian` for little endian.
+display the values of words with size 2, interpreting the byte order as big endian. Use `little_endian` for little endian.
 
 Usage of the combined bytes option (-c) requires the byte order option (-bo).
 <br><br>
@@ -63,6 +63,12 @@ Formats where the word-size cannot be inferred will use the -c attribute.
 $ data_inspect myfile -f ascii
 ```
 (coming soon) interpret the data values as ascii. (coming soon) interpret the data values as UTF-8, using `utf8`.
+<br><br>
+
+```
+$ data_inspect myfile -v
+```
+Verbose mode. It will echo back the version number, and the options hash it has interpreted from your command line options.
 <br><br>
 
 
