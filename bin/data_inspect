@@ -17,15 +17,11 @@ def main
 
   puts filename
 
-  file = File.open(filename, 'rb')
-
   
-  DataInspect.readfile(file) do |reader|
+  DataInspect.readfile(filename) do |reader|
 
-    reader.each_byte do |byte, offset|
-
-      puts "#{offset}: #{byte}"
-
+    while !reader.atEOS?
+      puts reader.next_byte
     end
 
 

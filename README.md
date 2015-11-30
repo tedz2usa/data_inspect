@@ -52,10 +52,11 @@ Usage of the combined bytes option (-c) requires the byte order option (-bo).
 ```
 $ data_inspect myfile -f signed_int
 ```
-interpret the data values as signed integers. Use `unsigned_int` for unsigned integers. 
+interpret the data values as signed integers. Use `unsigned_int` for unsigned integers. Use `float` for IEEE single-precision binary floating-point format. Use `double` for IEEE double-precision binary floating-point format. 
 
+Formats where the word-size can be inferred (`float`, `double`), do not require the -c, attribute, but if they are multibyte (like `float` and `double`), they do require the -bo byte order attribute.
 
-
+Formats where the word-size cannot be inferred will use the -c attribute.
 
 
 ```
