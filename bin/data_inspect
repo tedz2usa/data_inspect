@@ -9,8 +9,13 @@ require 'awesome_print'
 
 def main
 
-  options = ARGV
-  filename = options.first
+  if ARGV.size == 0
+    puts DataInspect.version
+    return
+  end
+
+
+  filename = ARGV.first
   options = get_options
 
   if options[:verbose]

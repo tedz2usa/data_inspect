@@ -1,6 +1,8 @@
+load 'lib/data_inspect.rb'
+
 Gem::Specification.new do |s|
   s.name = 'data_inspect'
-  s.version = '0.0.2'
+  s.version = DataInspect.version
   s.date = '2015-11-26'
   s.summary = 'A utility for inspecting and interpreting the contents of binary data files.'
   s.description = ''
