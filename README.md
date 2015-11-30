@@ -11,25 +11,25 @@ A command line utility and Ruby gem for inspecting and interpreting the contents
 $ data_inspect
 ```
 returns help information for how to use the command-line tool.
-  
+<br><br>
 
 ```
 $ data_inspect myfile
 ```
 displays the byte value of every byte in the file.
-
+<br><br>
 
 ```
 $ data_inspect myfile -h
 ```
 displays the byte values in hexadecimal
-
+<br><br>
 
 ```
 $ data_inspect myfile -b
 ```
 displays the byte values in binary
-
+<br><br>
 
 ```
 $ data_inspect myfile -o 219
@@ -39,7 +39,7 @@ displays the byte values after an offset of 219 bytes.
 ```
 $ data_inspect myfile -l 50
 ```
-
+<br><br>
 
 ```
 $ data_inspect myfile -c 2 -bo big_endian
@@ -47,7 +47,7 @@ $ data_inspect myfile -c 2 -bo big_endian
 display the byte values with every two bytes combined, interpreting the byte order as big endian. Use `little_endian` for little endian.
 
 Usage of the combined bytes option (-c) requires the byte order option (-bo).
-
+<br><br>
 
 ```
 $ data_inspect myfile -f signed_int
@@ -57,13 +57,13 @@ interpret the data values as signed integers. Use `unsigned_int` for unsigned in
 Formats where the word-size can be inferred (`float`, `double`), do not require the -c, attribute, but if they are multibyte (like `float` and `double`), they do require the -bo byte order attribute.
 
 Formats where the word-size cannot be inferred will use the -c attribute.
-
+<br><br>
 
 ```
 $ data_inspect myfile -f ascii
 ```
 (coming soon) interpret the data values as ascii. (coming soon) interpret the data values as UTF-8, using `utf8`.
-
+<br><br>
 
 
 ### In Ruby
