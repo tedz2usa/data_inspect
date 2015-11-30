@@ -20,8 +20,15 @@ def main
   
   DataInspect.readfile(filename) do |reader|
 
+    offset = 0
     while !reader.atEOS?
-      puts reader.next_byte
+      # value = reader.next_unsigned_int
+      # value = reader.next_ieee_single_precision_float(:big_endian)
+      value = reader.next_ieee_double_precision_float(:big_endian)
+      #puts reader.next_unsigned_int(2, :big_endian)
+      puts "#{offset}: #{value}"
+
+      offset += 1
     end
 
 
