@@ -3,7 +3,6 @@
 require 'data_inspect'
 require 'awesome_print'
 
-puts DataInspect.version
 
 
 
@@ -14,7 +13,13 @@ def main
   filename = options.first
   options = get_options
 
-  ap options
+  if options[:verbose]
+    puts "Version #{DataInspect.version}"
+    ap options
+    puts "\n\n"
+  end
+
+
 
 
 
@@ -51,8 +56,6 @@ def main
 
     # Technically incorrect, as offset is 1 word too far in advance. But this oversight is acceptable.
     max_length_offset = Math.log10(offset).to_i + 1
-
-    puts "\n\n"
 
     # Display the values
     values_to_display.each do |offset, value|
